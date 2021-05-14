@@ -81,6 +81,11 @@ namespace Game
 
         private record Line(Pieces A, Pieces B, Pieces C)
         {
+            /// <summary>
+            /// Calculates the score for this line.
+            /// </summary>
+            /// <param name="turnOwner">The player who has advantage.</param>
+            /// <returns>Using the scoring mechanism described at https://www.codeproject.com/Articles/43622/Solve-Tic-Tac-Toe-with-the-MiniMax-algorithm</returns>
             public int CalculateScore(Players turnOwner)
             {
                 return 0;
