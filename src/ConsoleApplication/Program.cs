@@ -9,7 +9,7 @@ namespace ConsoleApplication
         public static void Main(string[] args)
         {
             var gameBoard = new Board();
-            var ai = new MinMaxPlayer(gameBoard);
+            var ai = new MinMaxPlayer(gameBoard, MinMaxPlayer.Difficulty.Easy);
             while (!gameBoard.IsOver)
             {
                 Console.Clear();

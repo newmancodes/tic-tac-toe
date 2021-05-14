@@ -26,7 +26,7 @@ namespace Game
             }
         }
 
-        private IEnumerable<Line> Lines
+        internal IEnumerable<Line> Lines
         {
             get
             {
@@ -73,7 +73,7 @@ namespace Game
 
         public IEnumerable<Line> Rows => this.Lines.Take(3);
 
-        public bool IsOver => this.Lines.Any(l => l.CalculateScore(this.TurnOwner) == 1000);
+        public bool IsOver => this.Lines.Any(l => l.A == l.B && l.B == l.C && l.C != Pieces.Blank);
 
         public Board()
         {
@@ -90,13 +90,6 @@ namespace Game
                 {BoardPositions.MiddleBottom, Pieces.Blank},
                 {BoardPositions.RightBottom, Pieces.Blank},
             };
-        }
-
-        public int CalculateScore()
-        {
-            return this.Lines.Aggregate(
-                0,
-                (s, r) => s + r.CalculateScore(this.TurnOwner));
         }
 
         public void Play(BoardPositions boardPosition)
