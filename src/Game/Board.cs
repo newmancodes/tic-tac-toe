@@ -8,9 +8,25 @@ namespace Game
         private readonly IDictionary<BoardPositions, Pieces> placedPieces;
         private Line[] lines;
 
-        private Players TurnOwner { get; }
+        public Players TurnOwner { get; private set; }
 
-        private Line[] Lines
+        public Players? Winner
+        {
+            get
+            {
+                if (this.IsOver)
+                {
+                    if (this.TurnOwner == Players.O)
+                        return Players.X;
+                    
+                    return Players.O;
+                }
+                
+                return null;
+            }
+        }
+
+        private IEnumerable<Line> Lines
         {
             get
             {
@@ -41,11 +57,11 @@ namespace Game
                         this.placedPieces[BoardPositions.RightTop],
                         this.placedPieces[BoardPositions.RightMiddle],
                         this.placedPieces[BoardPositions.RightBottom]);
-                    this.lines[6] = new Line( // Descending Diagonal RTL 
+                    this.lines[6] = new Line( // Descending Diagonal LTR 
                         this.placedPieces[BoardPositions.LeftTop],
                         this.placedPieces[BoardPositions.Centre],
                         this.placedPieces[BoardPositions.RightBottom]);
-                    this.lines[7] = new Line( // Ascending Diagonal RTL
+                    this.lines[7] = new Line( // Ascending Diagonal LTR
                         this.placedPieces[BoardPositions.LeftBottom],
                         this.placedPieces[BoardPositions.Centre],
                         this.placedPieces[BoardPositions.RightTop]);
@@ -55,40 +71,50 @@ namespace Game
             }
         }
 
+        public IEnumerable<Line> Rows => this.Lines.Take(3);
+
+        public bool IsOver => this.Lines.Any(l => l.CalculateScore(this.TurnOwner) == 1000);
+
         public Board()
         {
             this.TurnOwner = Players.X;
             this.placedPieces = new Dictionary<BoardPositions, Pieces>
             {
-                { BoardPositions.LeftTop, Pieces.Blank },
-                { BoardPositions.MiddleTop, Pieces.Blank },
-                { BoardPositions.RightTop, Pieces.Blank },
-                { BoardPositions.LeftMiddle, Pieces.Blank },
-                { BoardPositions.Centre, Pieces.Blank },
-                { BoardPositions.RightMiddle, Pieces.Blank },
-                { BoardPositions.LeftBottom, Pieces.Blank },
-                { BoardPositions.MiddleBottom, Pieces.Blank },
-                { BoardPositions.RightBottom, Pieces.Blank },
+                {BoardPositions.LeftTop, Pieces.Blank},
+                {BoardPositions.MiddleTop, Pieces.Blank},
+                {BoardPositions.RightTop, Pieces.Blank},
+                {BoardPositions.LeftMiddle, Pieces.Blank},
+                {BoardPositions.Centre, Pieces.Blank},
+                {BoardPositions.RightMiddle, Pieces.Blank},
+                {BoardPositions.LeftBottom, Pieces.Blank},
+                {BoardPositions.MiddleBottom, Pieces.Blank},
+                {BoardPositions.RightBottom, Pieces.Blank},
             };
         }
 
         public int CalculateScore()
         {
             return this.Lines.Aggregate(
-                0, 
+                0,
                 (s, r) => s + r.CalculateScore(this.TurnOwner));
         }
 
-        private record Line(Pieces A, Pieces B, Pieces C)
+        public void Play(BoardPositions boardPosition)
         {
-            /// <summary>
-            /// Calculates the score for this line.
-            /// </summary>
-            /// <param name="turnOwner">The player who has advantage.</param>
-            /// <returns>Using the scoring mechanism described at https://www.codeproject.com/Articles/43622/Solve-Tic-Tac-Toe-with-the-MiniMax-algorithm</returns>
-            public int CalculateScore(Players turnOwner)
+            if (this.placedPieces[boardPosition] == Pieces.Blank)
             {
-                return 0;
+                if (this.TurnOwner == Players.X)
+                {
+                    this.placedPieces[boardPosition] = Pieces.X;
+                    this.TurnOwner = Players.O;
+                }
+                else
+                {
+                    this.placedPieces[boardPosition] = Pieces.O;
+                    this.TurnOwner = Players.X;
+                }
+
+                this.lines = null;
             }
         }
     }
